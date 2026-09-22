@@ -161,14 +161,6 @@ Services:
 
 Check logs: `docker compose logs -f`
 
-### Render (cloud)
-
-1. Push this repo to GitHub.
-2. In [Render](https://render.com), create a **Blueprint** and connect the repo.
-3. Render reads `render.yaml` and creates two services (API + dashboard).
-4. Set `LANDSLIDE_API_KEY` in the Render dashboard for the API service.
-5. After deploy, use the generated URLs for API and dashboard.
-
 ### Production checklist
 
 - Set `LANDSLIDE_API_AUTH_ENABLED=true` and a strong `LANDSLIDE_API_KEY`

@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  landslide-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: landslide-ai-api
+    restart: unless-stopped
+    ports:
+      - "${LANDSLIDE_API_PORT:-8000}:8000"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app/src
+      - LANDSLIDE_API_HOST=0.0.0.0
+      - LANDSLIDE_API_PORT=8000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: ["python", "run_api.py"]
+
+  landslide-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: landslide-ai-dashboard
+    restart: unless-stopped
+    ports:
+      - "${LANDSLIDE_DASHBOARD_PORT:-8501}:8501"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app/src
+    depends_on:
+      landslide-api:
+        condition: service_healthy
+    command:
+      [
+        "streamlit",
+        "run",
+        "src/landslide_ai/dashboard/app.py",
+        "--server.address=0.0.0.0",
+        "--server.port=8501",
+        "--server.headless=true",
+        "--browser.gatherUsageStats=false",
+      ]

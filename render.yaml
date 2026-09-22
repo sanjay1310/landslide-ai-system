@@ -1,0 +1,42 @@
+# Render Blueprint: deploy API + Streamlit dashboard from this repo.
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: landslide-ai-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHONPATH
+        value: /app/src
+      - key: LANDSLIDE_API_HOST
+        value: 0.0.0.0
+      - key: LANDSLIDE_API_AUTH_ENABLED
+        value: "true"
+      - key: LANDSLIDE_API_KEY
+        generateValue: true
+      - key: LANDSLIDE_ENABLE_TRAINED_RISK_MODEL
+        value: "true"
+      - key: LANDSLIDE_ENABLE_DEEP_RISK_MODEL
+        value: "false"
+      - key: LANDSLIDE_ENABLE_GRAPH_MODEL
+        value: "false"
+
+  - type: web
+    name: landslide-ai-dashboard
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    dockerCommand: >
+      streamlit run src/landslide_ai/dashboard/app.py
+      --server.address=0.0.0.0
+      --server.port=$PORT
+      --server.headless=true
+      --browser.gatherUsageStats=false
+    envVars:
+      - key: PYTHONPATH
+        value: /app/src
+      - key: LANDSLIDE_ENABLE_TRAINED_RISK_MODEL
+        value: "true"

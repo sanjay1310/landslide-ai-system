@@ -1,0 +1,10 @@
+{
+  "source_name": "nasa_power",
+  "output_path": "/Users/sanjaykumar/Documents/New project 2/data/raw/nasa_power/nasa_power_latest.json",
+  "mode": "placeholder",
+  "generated_at": "2026-04-06T17:15:15.965642+00:00",
+  "metadata": {
+    "source_url": "",
+    "reason": "source_url_not_configured"
+  }
+}

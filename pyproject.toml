@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "landslide-ai-system"
+version = "0.2.0"
+description = "Operational landslide risk intelligence platform with forecasting, API delivery, and dashboard analytics"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+keywords = ["landslide", "geospatial", "forecasting", "fastapi", "streamlit", "risk-modeling"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Framework :: FastAPI",
+  "Topic :: Scientific/Engineering :: GIS",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+  "altair>=5.3",
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "pydeck>=0.9",
+  "scikit-learn>=1.4",
+  "streamlit>=1.33",
+  "fastapi>=0.115",
+  "uvicorn>=0.30",
+]
+
+[project.optional-dependencies]
+ml = [
+  "torch>=2.2",
+]
+llm = [
+  "openai>=1.40",
+]
+dev = [
+  "pytest>=8.0",
+]
+
+[project.scripts]
+landslide-ai-demo = "main:main"
+landslide-ai-api = "run_api:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

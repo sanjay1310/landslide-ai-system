@@ -1,0 +1,9 @@
+region_id,state,district,latitude,longitude,rainfall_24h_mm,rainfall_7d_mm,slope_deg,elevation_m,soil_wetness_index,ndvi,temperature_c,neighbor_risk_mean,neighbor_count,label
+IN-MUN-MUNNAR,Kerala,Idukki,10.0889,77.0595,182,430,38,1240,0.78,0.31,21,0.72,5,1
+IN-DAR-DARJEELING,West Bengal,Darjeeling,27.0410,88.2663,66,182,24,980,0.53,0.58,25,0.36,3,0
+IN-GAN-GANGTOK,Sikkim,Gangtok,27.3389,88.6065,124,298,42,1510,0.69,0.40,19,0.61,4,1
+IN-SHI-SHIMLA,Himachal Pradesh,Shimla,31.1048,77.1734,138,315,36,2206,0.71,0.37,16,0.58,4,1
+IN-CHA-CHAMOLI,Uttarakhand,Chamoli,30.4200,79.3200,148,351,41,1820,0.74,0.35,17,0.66,5,1
+IN-AIZ-AIZAWL,Mizoram,Aizawl,23.7271,92.7176,172,402,39,1132,0.76,0.34,22,0.69,5,1
+IN-KAL-KALIMPONG,West Bengal,Kalimpong,27.0623,88.4753,91,221,31,1247,0.61,0.49,23,0.44,4,0
+IN-KUL-KULLU,Himachal Pradesh,Kullu,31.9579,77.1095,117,264,34,1279,0.64,0.45,20,0.52,4,1

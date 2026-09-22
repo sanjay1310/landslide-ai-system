@@ -1,0 +1,10 @@
+{
+  "source_name": "sentinel",
+  "output_path": "/Users/sanjaykumar/Documents/New project 2/data/raw/sentinel/sentinel_catalog_snapshot.json",
+  "mode": "placeholder",
+  "generated_at": "2026-04-11T02:16:48.930151+00:00",
+  "metadata": {
+    "source_url": "",
+    "reason": "source_url_not_configured"
+  }
+}

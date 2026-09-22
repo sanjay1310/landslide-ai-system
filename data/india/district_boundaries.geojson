@@ -1,0 +1,117 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "IN-MUN-MUNNAR",
+        "District": "Idukki",
+        "State": "Kerala",
+        "Risk Score": 0.0,
+        "Forecast Risk": 0.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[76.98, 10.03], [77.14, 10.03], [77.14, 10.14], [76.98, 10.14], [76.98, 10.03]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "IN-DAR-DARJEELING",
+        "District": "Darjeeling",
+        "State": "West Bengal",
+        "Risk Score": 0.0,
+        "Forecast Risk": 0.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[88.18, 26.98], [88.36, 26.98], [88.36, 27.10], [88.18, 27.10], [88.18, 26.98]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "IN-GAN-GANGTOK",
+        "District": "Gangtok",
+        "State": "Sikkim",
+        "Risk Score": 0.0,
+        "Forecast Risk": 0.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[88.53, 27.28], [88.68, 27.28], [88.68, 27.40], [88.53, 27.40], [88.53, 27.28]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "IN-SHI-SHIMLA",
+        "District": "Shimla",
+        "State": "Himachal Pradesh",
+        "Risk Score": 0.0,
+        "Forecast Risk": 0.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[77.08, 31.04], [77.27, 31.04], [77.27, 31.17], [77.08, 31.17], [77.08, 31.04]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "IN-CHA-CHAMOLI",
+        "District": "Chamoli",
+        "State": "Uttarakhand",
+        "Risk Score": 0.0,
+        "Forecast Risk": 0.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[79.20, 30.35], [79.43, 30.35], [79.43, 30.50], [79.20, 30.50], [79.20, 30.35]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "IN-AIZ-AIZAWL",
+        "District": "Aizawl",
+        "State": "Mizoram",
+        "Risk Score": 0.0,
+        "Forecast Risk": 0.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[92.63, 23.66], [92.80, 23.66], [92.80, 23.79], [92.63, 23.79], [92.63, 23.66]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "IN-KAL-KALIMPONG",
+        "District": "Kalimpong",
+        "State": "West Bengal",
+        "Risk Score": 0.0,
+        "Forecast Risk": 0.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[88.39, 27.00], [88.57, 27.00], [88.57, 27.12], [88.39, 27.12], [88.39, 27.00]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "IN-KUL-KULLU",
+        "District": "Kullu",
+        "State": "Himachal Pradesh",
+        "Risk Score": 0.0,
+        "Forecast Risk": 0.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[77.00, 31.89], [77.20, 31.89], [77.20, 32.03], [77.00, 32.03], [77.00, 31.89]]]
+      }
+    }
+  ]
+}

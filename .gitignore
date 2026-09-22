@@ -1,0 +1,24 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+.env
+.env.local
+.env.*.local
+*.pyc
+*.pyo
+*.pyd
+dist/
+build/
+.streamlit/
+artifacts/cache/
+.venv/
+
+# Large datasets and generated artifacts
+data/gis/
+data/inventory/
+data/regional/
+artifacts/
+*.egg-info/
+*.egg-info/

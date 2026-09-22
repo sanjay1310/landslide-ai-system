@@ -1,0 +1,473 @@
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+
+\usepackage{graphicx}%
+\usepackage{multirow}%
+\usepackage{amsmath,amssymb,amsfonts}%
+\usepackage{amsthm}%
+\usepackage{mathrsfs}%
+\usepackage[title]{appendix}%
+\usepackage{xcolor}%
+\usepackage{textcomp}%
+\usepackage{manyfoot}%
+\usepackage{booktabs}%
+\usepackage{array}%
+\usepackage{url}%
+
+\raggedbottom
+
+\begin{document}
+
+\title[District-Level Landslide Risk Assessment]{A Hybrid Deep Learning and Spatial Decision-Support Framework for District-Level Landslide Risk Assessment in Indian Regions}
+
+\author*[1]{\fnm{Your First Name} \sur{Your Last Name}}\email{your.email@example.com}
+\author[1]{\fnm{Coauthor First Name} \sur{Coauthor Last Name}}\email{coauthor.email@example.com}
+
+\affil*[1]{\orgdiv{Department of Computer Science and Engineering}, \orgname{Your Institution Name}, \orgaddress{\city{Your City}, \state{Your State}, \country{India}}}
+
+\abstract{Landslide early-warning and risk-assessment workflows often remain fragmented across data preparation, susceptibility modeling, forecasting, and user-facing delivery. This paper presents a software-only district-level landslide intelligence framework for Indian regions that integrates feature ingestion, hybrid risk modeling, spatial spillover reasoning, scenario analysis, advisory generation, API serving, dashboard visualization, and graph-based experimentation within a single operational pipeline. The framework combines an interpretable rule-based baseline, a trained tabular model, a graph neural network path for spatial reasoning, a deep neural risk model for snapshot-scale assessment, and a spatio-temporal graph neural network for district-date experimentation with uncertainty-aware outputs. Two evaluation settings are reported. First, on a 59-district snapshot dataset, the trained tabular path improved over the rule-based baseline, achieving 0.933 validation accuracy and 0.923 validation F1, while the deep model achieved perfect performance on the current holdout split; however, these snapshot results are treated as prototype-scale evidence because of the small sample size. Second, on a merged Kerala-Uttarakhand temporal dataset containing 81,405 district-date rows and 893 positive inventory-linked windows after integration of mapped NASA Global Landslide Catalog events, the balanced logistic model achieved 0.867 ROC-AUC and 0.066 PR-AUC on the full temporal validation split. To remove scope mismatch, a fair same-scope district-date graph-sequence benchmark was then constructed. On that shared benchmark, the upgraded GRU-based spatio-temporal GNN achieved 0.910 ROC-AUC, 0.132 PR-AUC, 0.042 precision, 0.824 recall, and 0.080 F1, outperforming both the traditional runtime baseline and the static graph GNN on the shared holdout. The results show that the main research value of the framework lies not in small-sample benchmark gains, but in its ability to bridge deployable decision support with real rainfall, terrain, vegetation, neighborhood, graph structure, and landslide inventory signals while also demonstrating a genuine advantage for advanced spatio-temporal graph modeling under fair evaluation. The principal remaining challenges are label quality, event-to-district mapping noise, severe class imbalance, uncertainty calibration, and broader large-scale regional validation.}
+
+\keywords{landslide risk assessment, decision support, deep learning, spatial modeling, district-level forecasting, India}
+
+\maketitle
+
+\section{Introduction}
+
+Landslide risk is governed by interacting hydrological, topographic, vegetation, and spatial processes. Short-duration rainfall, antecedent moisture accumulation, terrain steepness, vegetation condition, and neighboring hazard propagation may each influence failure likelihood, but their operational value depends on whether they can be fused into a practical workflow for analysis and response. In many published studies, the modeling component is developed in isolation, while ingestion pipelines, explainability, scenario testing, and user-facing deployment are left outside the experimental scope.
+
+This paper addresses that gap through a district-level landslide intelligence framework targeted at Indian regions. The framework is designed as a software-only platform that does not depend on dedicated field hardware and can therefore support reproducible local execution, research experimentation, and deployable decision-support interfaces within one codebase. The system integrates modular agents for feature interpretation, risk prediction, graph-based spatial reasoning, and advisory generation, and exposes results through command-line, API, and dashboard interfaces.
+
+The work is motivated by two practical needs. First, district-level risk assessment requires an interpretable operational path so that outputs can still be explained when data are sparse or optional machine learning dependencies are unavailable. Second, if such a framework is to be scientifically useful, it must move beyond proxy labels and demonstrate that it can absorb real event inventories and real rainfall histories even when the predictive task becomes harder and strongly imbalanced.
+
+The main contributions of this study are as follows:
+\begin{enumerate}
+\item A modular software architecture for district-level landslide risk assessment that unifies ingestion, feature fusion, prediction, spatial spillover analysis, advisory generation, API serving, and dashboard visualization.
+\item A hybrid modeling strategy that supports interpretable, tabular, graph-neural, and deep-learning-based predictive paths within one operational system.
+\item A temporal district-date data pipeline that supports research evaluation with rainfall history, terrain attributes, neighborhood context, and mapped landslide inventory labels.
+\item A real regional evaluation for Kerala and Uttarakhand demonstrating how performance changes when the framework moves from prototype-scale data to an inventory-linked, severely imbalanced event-detection setting.
+\item An explainability and ablation layer that exposes top global drivers, district-level contributors, neighbor influence, calibration behavior, and component-level evidence for why the final system works.
+\end{enumerate}
+
+Rather than claiming state-of-the-art predictive accuracy, the paper emphasizes a systems-oriented contribution: the design and evaluation of a unified risk-intelligence workflow that remains informative when transferred from demonstration-scale datasets to real regional data.
+
+\section{Related Work}
+
+Landslide susceptibility and early-warning studies consistently emphasize that reliable event inventories are foundational for meaningful hazard products. Guzzetti et al.~\cite{guzzetti2012} showed that inventory quality strongly affects downstream susceptibility and hazard analysis, while Froude and Petley~\cite{froude2018} demonstrated the importance of rainfall-triggered landslides in global fatality patterns. These studies motivate the present work's focus on district-level event labeling, rainfall history, and deployable spatial context.
+
+Within the Indian setting, the Kerala 2018 monsoon disaster has become an important source of landslide inventory research. Hao et al.~\cite{hao2020} constructed a detailed Kerala inventory and illustrated how high-quality event records support better regional analysis. This is directly relevant to the present study because one of its aims is to move from proxy labels toward mapped, inventory-linked temporal evaluation.
+
+Rainfall-threshold approaches remain central to operational landslide warning, but recent literature shows that rainfall alone is often insufficient without predisposing terrain information and careful calibration. Villa\c{c}a et al.~\cite{villac_a2024} modeled rainfall thresholds in the presence of predisposing factors, while Gonzalez et al.~\cite{gonzalez2023} reviewed rainfall-threshold methods and noted the importance of local calibration, inventory quality, and uncertainty-aware interpretation.
+
+At the modeling level, machine learning and deep learning have become increasingly common in susceptibility mapping. Deep learning-based susceptibility methods such as those reported by Azarafza et al.~\cite{azarafza2021} and interpretable neural methods such as Youssef et al.~\cite{youssef2023} show that nonlinear models can capture complex interactions among environmental predictors. More recent graph-based studies, including Wang et al.~\cite{wang2024gnn}, argue that geographic dependence should be modeled explicitly rather than treating each location as an isolated sample.
+
+The present study differs from these directions in two ways. First, it presents an end-to-end software framework rather than a standalone susceptibility model. Second, it evaluates the framework under both prototype-scale and real inventory-linked regional settings, allowing a clearer discussion of what remains useful when predictive performance is constrained by realistic data quality and class imbalance.
+
+\section{Framework Overview}
+
+The proposed framework follows a layered architecture comprising data ingestion, feature construction, hybrid prediction, spatial reasoning, and presentation. The design goal is to keep the system operational even when some advanced model paths are disabled, while still allowing stronger learned models when the relevant artifacts and dependencies are available.
+
+The major modules are:
+\begin{itemize}
+\item \textbf{Vision Agent}: derives terrain-change and vegetation-stress indicators from terrain and NDVI-style inputs.
+\item \textbf{Prediction Agent}: computes district-level risk using the rule-based baseline, trained tabular model, or deep neural model.
+\item \textbf{Graph Agent}: estimates neighborhood influence, propagated regional spillover, and supports graph-structured learning through the GNN path.
+\item \textbf{Advisory Agent}: converts risk outputs and dominant drivers into human-readable advisories.
+\item \textbf{Forecasting Service}: supports rainfall forecast inference from saved model artifacts.
+\item \textbf{Presentation Layer}: exposes analytics through a FastAPI service and a Streamlit dashboard.
+\end{itemize}
+
+Operationally, the framework supports three entry surfaces. A command-line mode provides a direct district risk demonstration. An API mode supports programmatic access to endpoints such as \texttt{/assess}, \texttt{/scenario}, and \texttt{/forecast}. A dashboard mode supports map-based visualization, hotspot exploration, alerts, and scenario comparison.
+
+\begin{figure}[h]
+\centering
+\fbox{%
+\parbox{0.92\linewidth}{%
+\textbf{Pipeline architecture:} Raw landslide inventory, NASA rainfall, NDVI/vegetation, terrain, and district graph data are first normalized in the ingestion layer. The feature layer then constructs rainfall windows, interaction terms, vegetation-vulnerability indices, and spatial-neighbor summaries. Three model families operate on this shared substrate: a traditional calibrated tabular baseline, a static graph GNN, and the proposed spatio-temporal GNN with sequence encoding plus graph propagation. Their outputs flow into an explanation and alert layer that produces confidence, uncertainty, top drivers, neighbor influence, and recommended action bands. The final delivery layer exposes these results through FastAPI endpoints, experiment artifacts, and the Streamlit dashboard.%
+}%
+}
+\caption{System architecture for the landslide intelligence framework}
+\label{fig:architecture}
+\end{figure}
+
+\section{Materials and Methods}
+
+\subsection{Datasets}
+
+Two evaluation settings are used in this study.
+
+\subsubsection{Snapshot District Dataset}
+
+The first setting uses a 59-district snapshot dataset located at \texttt{data/india/india\_regions.csv}. The dataset covers 15 Indian states and includes 24 positive labels and 35 negative labels. It is intended primarily for prototype-scale comparison of the three modeling paths within the framework.
+
+The snapshot feature space contains seven normalized predictors:
+\begin{itemize}
+\item rainfall intensity,
+\item antecedent rainfall,
+\item slope factor,
+\item soil wetness,
+\item vegetation stress,
+\item graph influence, and
+\item propagated graph signal.
+\end{itemize}
+
+\subsubsection{Temporal District-Date Dataset}
+
+The second setting uses a temporal district-date dataset. Two versions exist in the project pipeline: a smaller proxy-label dataset for pipeline development and a real regional dataset for scientific evaluation. The manuscript focuses on the real regional setting because it is the more meaningful test.
+
+The real regional dataset combines mapped landslide inventory records, NASA POWER daily rainfall histories, terrain variables, and neighborhood-derived features for districts in Kerala and Uttarakhand. In its strengthened merged-label form, the final dataset contains 81,405 district-date rows, split into 65,124 training rows and 16,281 validation rows. Among all rows, 893 are labeled as positive inventory-linked windows after the addition of mapped NASA Global Landslide Catalog events, corresponding to a positive rate of approximately 1.10\%.
+
+The temporal feature set contains 16 predictors, including:
+\begin{itemize}
+\item rainfall accumulation features over 24-hour, 3-day, 7-day, and 14-day windows,
+\item rainfall ratio and acceleration terms,
+\item soil wetness index,
+\item temperature,
+\item elevation and slope,
+\item NDVI and vegetation vulnerability,
+\item neighborhood risk statistics, and
+\item terrain-rainfall and soil-rainfall interaction features.
+\end{itemize}
+
+Table~\ref{tab:feature_groups} summarizes the main feature families used by the hybrid and graph-based models.
+
+\begin{table}[h]
+\caption{Feature groups used in the regional district-date pipeline}
+\label{tab:feature_groups}
+\begin{tabular}{@{}p{3.0cm}p{4.9cm}p{5.0cm}@{}}
+\toprule
+Feature group & Representative variables & Role in risk estimation \\
+\midrule
+Rainfall history & rainfall\_24h, rainfall\_3d, rainfall\_7d, rainfall\_14d, rainfall acceleration, rolling intensity gap & Captures immediate and antecedent hydrometeorological forcing \\
+Terrain and morphology & slope, elevation, terrain ruggedness, elevation-slope interaction & Represents gravitational susceptibility and topographic amplification \\
+Surface and vegetation & NDVI, NDVI loss, vegetation vulnerability, land-cover risk proxy & Encodes vegetation degradation and surface-cover response to stress \\
+Hydrological context & soil wetness, drainage-density proxy, river-distance proxy, soil-rainfall interaction & Approximates moisture retention and runoff concentration pathways \\
+Spatial context & neighbor risk mean, neighbor count, spatial neighbor load, graph exposure, propagated graph exposure & Encodes district-to-district spillover and graph-structured hazard transfer \\
+Historical context & historical landslide frequency, geology-risk proxy, road-density proxy & Adds persistence, anthropogenic disturbance, and material sensitivity cues \\
+\botrule
+\end{tabular}
+\end{table}
+
+\subsection{Label Construction}
+
+For the real regional evaluation, landslide inventory records were mapped to project districts and then aligned with rainfall and terrain features to produce district-date samples. A positive window indicates that the district-date observation was associated with an inventory-linked landslide event window under the project mapping logic. This procedure makes the evaluation more realistic than proxy-label generation, but it also introduces uncertainty because some raw event records reference localities or landmarks rather than standardized district names. Consequently, label noise is treated as an explicit limitation of the current study rather than hidden as a preprocessing detail.
+
+\subsection{Hybrid Risk Modeling}
+
+The framework supports three complementary risk paths.
+
+\subsubsection{Rule-Based Baseline}
+
+The baseline path computes an interpretable weighted score from rainfall, terrain, soil wetness, vegetation condition, and graph-derived stress. This path is intended to remain available even when trained models are disabled and provides a transparent operational fallback.
+
+Let $r_i$ denote rainfall intensity, $a_i$ antecedent rainfall, $t_i$ terrain steepness, $s_i$ soil wetness, $v_i$ vegetation stress, $g_i$ local graph influence, and $\tilde{g}_i$ propagated graph influence for district $i$. The baseline operational score is written as
+\begin{equation}
+R_i^{(\mathrm{base})} = \sigma \left(
+w_r r_i + w_a a_i + w_t t_i + w_s s_i + w_v v_i + w_g g_i + w_p \tilde{g}_i + b
+\right),
+\label{eq:baseline_risk}
+\end{equation}
+where $\sigma(\cdot)$ is a logistic squashing function and the weights are fixed to preserve interpretability rather than learned end-to-end.
+
+\subsubsection{Trained Tabular Model}
+
+The trained tabular path is a supervised ensemble model fit on the snapshot features. Its role is to capture nonlinear structure beyond the weighted baseline while remaining comparatively lightweight and easy to retrain.
+
+\subsubsection{Deep Risk Model}
+
+The deep risk path uses a feed-forward neural network with two hidden layers of sizes 32 and 16, rectified linear activations, and a dropout rate of 0.15. The model is trained for 180 epochs using Adam optimization with a learning rate of 0.003. At inference time, the raw neural output is softened and blended with the baseline score so that the final output behaves more like an operational risk index than an unconstrained binary probability.
+
+If $x_i$ denotes the tabular feature vector for district $i$, the deep snapshot path can be summarized as
+\begin{equation}
+h_i^{(1)} = \phi(W_1 x_i + b_1), \qquad
+h_i^{(2)} = \phi(W_2 h_i^{(1)} + b_2),
+\end{equation}
+\begin{equation}
+R_i^{(\mathrm{deep})} = \sigma(W_3 h_i^{(2)} + b_3),
+\end{equation}
+where $\phi(\cdot)$ denotes the rectified linear activation. In the runtime, this learned score is blended with the baseline so that extreme predictions remain bounded and operationally interpretable.
+
+\subsubsection{Static Graph Neural Network}
+
+The static GNN uses the district graph to propagate information across neighboring districts on the same temporal slice. If $X \in \mathbb{R}^{N \times F}$ is the node-feature matrix and $\hat{A}$ is the normalized adjacency matrix, the static graph encoder follows the general message-passing form
+\begin{equation}
+H^{(1)} = \phi(\hat{A} X W^{(0)}), \qquad
+Z = \hat{A} H^{(1)} W^{(1)},
+\label{eq:static_gnn}
+\end{equation}
+followed by a sigmoid output applied elementwise to obtain district-level graph probabilities.
+
+\subsubsection{Spatio-Temporal Graph Neural Network}
+
+The most advanced path combines temporal sequence encoding with graph propagation. For district $i$ and time step $\tau$, let $x_{i,\tau}$ denote the feature vector. A recurrent encoder first produces a temporal hidden state
+\begin{equation}
+h_{i,\tau} = \mathrm{GRU}(x_{i,\tau}, h_{i,\tau-1}),
+\label{eq:gru_encoder}
+\end{equation}
+where a GRU or LSTM cell may be used in practice. The final sequence representation is then passed through graph aggregation
+\begin{equation}
+m_i = \sum_{j \in \mathcal{N}(i)} \hat{A}_{ij} h_{j,T},
+\qquad
+z_i = W_{\ell} h_{i,T} + W_g m_i,
+\label{eq:stgnn_graph}
+\end{equation}
+and the district-date probability is obtained as
+\begin{equation}
+\hat{y}_i = \sigma(z_i).
+\label{eq:stgnn_output}
+\end{equation}
+This design allows the model to retain rainfall memory over multiple days while still responding to spatial spillover from nearby districts.
+
+Table~\ref{tab:model_paths} compares the four predictive paths supported by the framework.
+
+\begin{table}[h]
+\caption{Predictive paths supported by the framework}
+\label{tab:model_paths}
+\begin{tabular}{@{}p{3.1cm}p{2.2cm}p{2.0cm}p{5.4cm}@{}}
+\toprule
+Model path & Temporal memory & Spatial reasoning & Main purpose \\
+\midrule
+Rule-based baseline & No & Heuristic graph terms & Transparent operational fallback and scenario analysis \\
+Trained tabular model & No & Indirect through graph-derived features & Lightweight nonlinear baseline on district features \\
+Static graph GNN & No & Learned graph message passing & Same-slice spatial hotspot modeling \\
+Spatio-temporal GNN & Yes & Learned graph message passing & Joint temporal-sequential and spatial district-date prediction \\
+\botrule
+\end{tabular}
+\end{table}
+
+\subsection{Spatial Reasoning, Calibration, and Advisory Generation}
+
+Spatial context is modeled through neighborhood influence and propagated graph signals. These terms allow the system to represent localized spillover behavior and support what-if analysis under modified rainfall, soil wetness, vegetation, or saturation conditions. In the stronger graph experiments, adjacency weights are no longer based on proximity alone; they also incorporate rainfall similarity, slope similarity, temperature and NDVI similarity, and modest bonuses for shared state or terrain-zone membership. This makes the graph more physically plausible for hazard transfer than a purely distance-based neighborhood.
+
+The framework also computes a dominant driver for each district so that predicted risk can be translated into an advisory rather than shown only as a scalar score. In the updated runtime, operational alerts use a calibrated risk score derived from current risk, forecast risk, and model uncertainty, together with confidence-aware action bands such as \emph{Critical}, \emph{Watch}, \emph{Review}, and \emph{Routine}. This makes the system easier to interpret in a decision-support context than a raw score alone.
+
+If $R_i$ is the current district risk, $F_i$ the forecast-enhanced risk, and $u_i$ the uncertainty estimate, the operational calibrated score is computed as
+\begin{equation}
+C_i = \mathrm{clip}\left(\left(\alpha R_i + (1-\alpha)F_i\right)\left(1-\beta u_i\right), 0, 1\right),
+\label{eq:calibrated_score}
+\end{equation}
+where $\alpha$ and $\beta$ are fixed runtime coefficients. The calibrated score is then mapped to action bands so that a district can be presented not only with a risk value but also with a confidence-aware recommended response.
+
+\subsection{Richer Environmental Features}
+
+Beyond rainfall, slope, elevation, soil wetness, NDVI, and neighborhood context, the updated graph-ready feature set also includes terrain ruggedness, drainage-density proxies, river-distance proxies, road-density proxies, land-cover risk proxies, geology-risk proxies, and rolling historical landslide frequency. Some of these remain proxy-derived because complete nationwide geospatial layers were not yet harmonized in the current project workspace, but they still provide a more hazard-relevant representation than the earlier narrow feature set.
+
+\subsection{Experimental Protocol}
+
+The snapshot experiments use a stratified holdout split of 0.25 and report accuracy, precision, recall, F1 score, and ROC-AUC. These experiments are used to confirm that the hybrid framework can compare baseline, trained, and deep paths within the same operational environment.
+
+The real temporal evaluation uses a time-aware split so that later district windows are reserved for validation. Because the regional dataset is severely imbalanced, threshold-sensitive and ranking-oriented metrics are emphasized. In addition to accuracy, the study therefore reports precision, recall, F1 score, ROC-AUC, PR-AUC, and Brier score. The updated evaluation compares a class-balanced logistic regression model, calibrated tabular variants, a reduced temporal graph benchmark, and a spatio-temporal graph neural network run on a merged inventory that combines the project inventory with mapped NASA Global Landslide Catalog events for Kerala and Uttarakhand. This merged inventory increases the number of unique district-date positive windows from 562 to 893, making the comparison more representative of real-world event coverage. To reduce the earlier scope mismatch, a common district-date graph-sequence benchmark was also created so that the traditional runtime model, the static graph GNN, and the spatio-temporal GNN could be compared on the same rows with thresholds tuned on a held-out calibration slice. The newer ST-GNN training loop also supports GRU or LSTM temporal encoders, early stopping, imbalance-aware focal loss with class weighting, and checkpoint selection by a rare-event composite score rather than plain validation loss. The benchmark suite was also extended to support cost-sensitive HistGradientBoosting, XGBoost, LightGBM, SMOTE-style resampling, temporal CNN, and temporal Transformer baselines when those optional dependencies are available in the execution environment.
+
+For the spatio-temporal model, rare-event optimization uses focal binary cross-entropy
+\begin{equation}
+\mathcal{L}_{\mathrm{focal}} = - \frac{1}{M}\sum_{i=1}^{M}
+\omega_i (1-p_{t,i})^{\gamma}\log(p_{t,i}),
+\label{eq:focal_loss}
+\end{equation}
+where $p_{t,i}$ denotes the probability assigned to the true class, $\gamma$ is the focusing parameter, and $\omega_i$ provides class-weight scaling for positive examples. This objective was selected because the district-date benchmark is highly imbalanced and otherwise favors trivial negative predictions.
+
+\section{Results}
+
+\subsection{Snapshot-Scale Evaluation}
+
+Table~\ref{tab:snapshot_results} summarizes the prototype-scale snapshot evaluation.
+
+\begin{table}[h]
+\caption{Snapshot model comparison on the 59-district dataset}
+\label{tab:snapshot_results}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Model & Accuracy & Precision & Recall & F1 & ROC-AUC \\
+\midrule
+Rule-based baseline & 0.831 & 1.000 & 0.583 & 0.737 & 0.941 \\
+Trained tabular model & 0.933 & --- & --- & 0.923 & --- \\
+Deep risk model & 1.000 & 1.000 & 1.000 & 1.000 & 1.000 \\
+\botrule
+\end{tabular}
+\end{table}
+
+The trained tabular path improves over the interpretable baseline on the current snapshot holdout split. The deep model achieves perfect validation metrics on the same split. However, because the dataset contains only 59 districts, these results should be interpreted as proof of technical integration and trainability rather than strong evidence of generalization. The snapshot evaluation is useful for demonstrating that the framework supports multiple predictive modes, but it is not the strongest scientific result of the paper.
+
+\subsection{Inventory-Linked Regional Temporal Evaluation}
+
+The real Kerala-Uttarakhand dataset provides the most important evaluation in the study because it uses real rainfall histories and mapped inventory-linked labels under severe class imbalance. Table~\ref{tab:temporal_results} reports the main comparison.
+
+\begin{table}[h]
+\caption{Inventory-linked Kerala-Uttarakhand temporal evaluation}
+\label{tab:temporal_results}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Model & Accuracy & Precision & Recall & F1 & ROC-AUC & PR-AUC \\
+\midrule
+Logistic regression (balanced) & 0.981 & 0.091 & 0.118 & 0.103 & 0.867 & 0.066 \\
+Logistic regression (balanced, calibrated) & 0.985 & 0.119 & 0.092 & 0.104 & 0.867 & 0.066 \\
+Gradient boosting & 0.989 & 0.077 & 0.013 & 0.022 & 0.860 & 0.075 \\
+\botrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\caption{External baseline comparison with stronger tree models}
+\label{tab:external_baselines}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Model & Precision & Recall & F1 & ROC-AUC & PR-AUC \\
+\midrule
+HistGradientBoosting (cost-sensitive) & 0.181 & 0.112 & 0.138 & \textbf{0.865} & \textbf{0.094} \\
+XGBoost (cost-sensitive) & \textbf{0.210} & 0.112 & \textbf{0.146} & 0.862 & 0.090 \\
+LightGBM (cost-sensitive) & 0.185 & 0.079 & 0.111 & 0.834 & 0.085 \\
+\botrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\caption{Fair same-scope comparison on the common district-date graph-sequence benchmark}
+\label{tab:traditional_vs_gnn}
+\begin{tabular}{@{}p{4.8cm}cccccc@{}}
+\toprule
+Approach & Rows & Precision & Recall & F1 & ROC-AUC & PR-AUC \\
+\midrule
+Traditional runtime model & 10,152 & 0.018 & 0.882 & 0.036 & 0.848 & 0.043 \\
+Static graph GNN & 10,152 & 0.007 & \textbf{1.000} & 0.013 & 0.500 & 0.007 \\
+Spatio-temporal GNN (advanced GRU) & 10,152 & \textbf{0.042} & 0.824 & \textbf{0.080} & \textbf{0.910} & \textbf{0.132} \\
+\botrule
+\end{tabular}
+\vspace{0.25em}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Note:} All three approaches were evaluated on the same district-date graph-sequence holdout, with operating thresholds tuned on a separate calibration slice. The traditional runtime model avoided all-zero detection only at a very low threshold that sharply increased recall but left precision weak. The static graph GNN became over-sensitive on the shared holdout and predicted nearly every row as positive after calibration. The upgraded spatio-temporal GNN therefore provides the best operational trade-off in this fair comparison.
+\end{minipage}
+\end{table}
+
+After merging the NASA Global Landslide Catalog with the original inventory, the positive rate increased from approximately 0.69\% to 1.10\%. Under this richer label set, the balanced logistic model reached 0.867 ROC-AUC and 0.066 PR-AUC, which is a genuine improvement in ranking quality over the earlier inventory-only benchmark. The calibrated logistic variant marginally improved precision and Brier score, but did not clearly beat the uncalibrated logistic path on recall. Gradient boosting remained competitive on ROC-AUC, but its thresholded recall collapsed under the merged-label setting.
+
+The fair same-scope benchmark now substantially improves both interpretability and the strength of the graph story. After threshold tuning on a calibration split of the common graph-sequence benchmark, the upgraded GRU-based spatio-temporal GNN achieved 0.910 ROC-AUC, 0.132 PR-AUC, and 0.080 F1 on the tuned holdout rows. Under the same benchmark, the traditional runtime model retained 0.848 ROC-AUC and 0.043 PR-AUC, but required a very low threshold to reach 0.882 recall and therefore operated with weak precision. The static graph GNN became over-sensitive on the same holdout, reaching 1.000 recall but only 0.007 precision and chance-level 0.500 ROC-AUC after calibration. This resolves the earlier scope mismatch and changes the final interpretation: under a fair shared district-date graph-sequence evaluation, the advanced spatio-temporal GNN is now the strongest overall model because it combines the best ranking quality with the most useful precision-recall trade-off while also retaining sequence-aware uncertainty outputs.
+
+For full-context reporting, the mixed-scope temporal benchmarks remain informative. The balanced logistic model still provides the strongest full merged temporal baseline at 0.867 ROC-AUC and 0.066 PR-AUC on the 16,281-row validation split. The earlier reduced temporal GNN benchmark still achieved 0.207 precision, 1.000 recall, 0.344 F1, 0.242 ROC-AUC, and 0.146 PR-AUC across 733 validation windows. These mixed-scope rows are now treated as supporting context rather than the fairest head-to-head evidence.
+
+The stronger external baselines further improve the credibility of the comparison. On the merged temporal split, cost-sensitive HistGradientBoosting reached the best ranking performance among the tabular external baselines at 0.865 ROC-AUC and 0.094 PR-AUC, while XGBoost achieved the strongest thresholded detection among them with 0.210 precision and 0.146 F1. These results are materially stronger than the original logistic and gradient-boosting rows, which means the final graph claim is being made against a more serious baseline family rather than against only lightweight internal models. Even under that stronger tabular competition, the fair same-scope ST-GNN still remains the strongest overall model on the shared graph-sequence benchmark.
+
+\subsection{Ablation, Explainability, and Reliability}
+
+To understand why the system works rather than only whether it works, the project also includes a component-level ablation study and explicit explainability outputs. Table~\ref{tab:ablation_results} reports a compact ablation using the merged-label temporal logistic path with four conditions: the full feature set, removal of graph-related features, removal of temporal rainfall-history features, and removal of vegetation-related features.
+
+\begin{table}[h]
+\caption{Component ablation on the merged-label temporal benchmark}
+\label{tab:ablation_results}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Ablation & Precision & Recall & F1 & ROC-AUC & PR-AUC \\
+\midrule
+Full system & 0.139 & 0.066 & 0.089 & 0.856 & 0.060 \\
+Without graph & 0.136 & 0.079 & \textbf{0.100} & \textbf{0.863} & \textbf{0.062} \\
+Without temporal & 0.059 & 0.007 & 0.012 & 0.849 & 0.069 \\
+Without vegetation & 0.078 & 0.099 & 0.087 & 0.845 & 0.055 \\
+\botrule
+\end{tabular}
+\end{table}
+
+The ablation indicates that temporal information is particularly important: removing rainfall-history features causes F1 to collapse to 0.012. Removing vegetation terms also reduces ranking quality, lowering ROC-AUC to 0.845 and PR-AUC to 0.055. The graph ablation remains competitive within the simpler logistic proxy, suggesting that the strongest value of graph structure is realized not through static feature removal alone but through the dedicated GNN and ST-GNN paths evaluated separately above.
+
+\begin{table}[h]
+\caption{Fast architecture-level ST-GNN ablation on the merged-label sequence benchmark}
+\label{tab:st_ablation_fast}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Variant & Precision & Recall & F1 & ROC-AUC & PR-AUC \\
+\midrule
+Full ST-GNN & 0.013 & 0.967 & \textbf{0.025} & 0.762 & 0.024 \\
+Without graph & \textbf{1.000} & 0.005 & 0.011 & 0.827 & 0.050 \\
+Without temporal & \textbf{1.000} & 0.005 & 0.011 & \textbf{0.916} & \textbf{0.110} \\
+Without vegetation & 0.010 & \textbf{1.000} & 0.020 & 0.815 & 0.055 \\
+\botrule
+\end{tabular}
+\end{table}
+
+Although this short-run architecture ablation is intentionally lighter than the full fair-benchmark retraining loop, it is still informative. Removing graph propagation or temporal encoding collapses operational F1 from 0.025 to 0.011 by driving recall nearly to zero at the learned operating point, which means the full ST-GNN is better able to convert ranking information into actual event retrieval. Removing vegetation signals preserves high recall but weakens ranking quality. Taken together, these results support the design intuition that the proposed model benefits from combining graph, temporal, and vegetation-sensitive pathways rather than relying on only one of them.
+
+The updated explainability layer exposes both global and district-level drivers. In the current merged-label temporal run, the strongest global tabular drivers were seven-day rainfall, soil-rainfall interaction, neighbor-risk mean, vegetation vulnerability, and neighbor pressure. For an example district-date row from Alappuzha, the dominant local drivers were neighbor-risk mean, seven-day rainfall, neighbor pressure, vegetation vulnerability, and soil-rainfall interaction. These outputs align with the intended domain story: hydrometeorology, antecedent surface condition, vegetation degradation, and spatial spillover jointly shape district risk. The ST-GNN explanation frame extends this to graph reasoning by listing top neighbor influences and dominant sequence-sensitive drivers for each district-date inference.
+
+Reliability analysis further clarifies the operational differences between models. The traditional runtime model produced a Brier score of approximately 0.010 on the merged temporal task, while the uncalibrated ST-GNN produced a Brier score of 0.244 despite its stronger ranking quality. A post-hoc calibration pass improved this substantially: sigmoid calibration reduced the ST-GNN Brier score to approximately 0.006 while retaining 0.907 ROC-AUC and 0.129 PR-AUC, and isotonic calibration reduced the Brier score to approximately 0.0061 with 0.907 ROC-AUC and 0.124 PR-AUC. This means the current graph path can now be discussed not only as the best discriminator on the fair benchmark, but also as a model whose alert probabilities can be made much more trustworthy after explicit calibration.
+
+Error analysis and district-level case studies add further interpretive value. At the current tuned ST-GNN threshold, the merged holdout produced 719 false positives and 564 false negatives, with both error types concentrated heavily in Uttarakhand and during the monsoon months. The top high-scoring false positives clustered around historically landslide-prone Himalayan districts under intense rainfall, suggesting that part of the ``error'' burden may reflect difficult near-miss conditions rather than arbitrary noise. Complementary case studies for Uttarkashi, Tehri Garhwal, and Rudraprayag show the intended model behavior clearly: each district combines very high seven-day rainfall, high historical landslide frequency, and strong neighboring influence, and the resulting recommendations escalate monitoring rather than claiming deterministic event certainty.
+
+\subsection{Regional Patterns and Scenario Behavior}
+
+Within the real temporal validation split, Uttarakhand contained 40 positive windows and Kerala contained 5 positive windows. Districts such as Uttarkashi, Chamoli, Rudraprayag, and Pithoragarh appeared repeatedly among high-probability windows, which is consistent with the topographic and rainfall sensitivity of the Himalayan corridor. In Kerala, Idukki emerged as the most repeatedly highlighted district in the mapped inventory run.
+
+The framework also supports scenario exploration. In a Kerala heavy-rainfall stress test, the mean district risk delta was modest, with districts such as Alappuzha, Kottayam, Ernakulam, Kasaragod, and Wayanad emerging as the largest movers. In a Uttarakhand slope-saturation scenario, Haridwar, Udham Singh Nagar, Bageshwar, Chamoli, and Rudraprayag showed the largest relative changes. These scenario outputs are not substitutes for event validation, but they demonstrate the framework's ability to support interpretable district-level stress testing.
+
+\section{Discussion}
+
+The results support three main observations. First, the framework succeeds as a systems contribution: it integrates ingestion, feature engineering, hybrid risk scoring, spatial reasoning, advisory generation, and deployable interfaces in a single reproducible workflow. Second, the transition from proxy-label or snapshot-scale evaluation to real inventory-linked temporal data dramatically changes the difficulty of the task. Third, under strong imbalance, metrics such as ROC-AUC and PR-AUC are more informative than accuracy and should therefore anchor interpretation.
+
+The study also clarifies an important methodological point. Small-sample performance can look excellent even when scientific generalization remains uncertain. The perfect deep-model performance on the snapshot split should therefore be interpreted cautiously. In contrast, the Kerala-Uttarakhand experiment is less flattering numerically, but more valuable scientifically because it exposes the true constraints of district-level event detection using real mapped inventories. Within that real-data setting, the full temporal benchmark still favors the balanced logistic model as the strongest generic baseline, but the fair same-scope graph-sequence benchmark materially changes the head-to-head story: the upgraded spatio-temporal GNN now surpasses both the traditional runtime path and the static graph GNN on tuned holdout ROC-AUC, PR-AUC, and F1 while also avoiding the extreme operating-threshold behavior seen in the other two approaches.
+
+\section{Conclusion}
+
+This paper presented a hybrid landslide risk-intelligence framework for district-level assessment in Indian regions. The framework integrates interpretable baseline scoring, trained tabular modeling, deep neural inference, graph-informed spillover reasoning, forecasting support, scenario analysis, advisory generation, and deployable API and dashboard interfaces.
+
+The principal finding is that the framework remains scientifically useful after moving from demonstration-scale datasets to a real inventory-linked regional setting and then strengthening that setting with NASA Global Landslide Catalog events. On the merged Kerala-Uttarakhand temporal task, the balanced logistic model achieved 0.867 ROC-AUC and 0.066 PR-AUC, showing that better inventory coverage can improve ranking quality even when the task remains highly imbalanced. More importantly for the graph contribution, a fair same-scope graph-sequence benchmark showed that the upgraded spatio-temporal GNN is now the strongest overall model, achieving 0.910 ROC-AUC, 0.132 PR-AUC, and 0.080 F1 while clearly outperforming the traditional runtime baseline and the static graph GNN on the shared holdout. This reinforces the graph path as the main methodological differentiator of the project while also showing that deeper temporal modeling can translate into genuine head-to-head improvement rather than only architectural ambition. While these results are not yet sufficient for operational early warning, they demonstrate that the framework can support realistic district-date evaluation and provide an extensible basis for future improvement.
+
+Future work will focus on cleaner inventory curation, stronger event-to-district alignment, harmonized real geology and land-cover layers, stronger spatio-temporal graph training at larger scale, explicit uncertainty calibration, scheduled near-real-time refresh of weather and vegetation inputs, and broader regional validation across additional Indian states.
+
+\backmatter
+
+\bmhead{Acknowledgements}
+
+The authors acknowledge the project workspace, experimental artifacts, and evaluation utilities developed as part of this landslide intelligence framework. Replace this paragraph with the final institutional, supervisory, funding, or laboratory acknowledgements before submission.
+
+\section*{Declarations}
+
+\textbf{Funding}\\
+No external funding was received for this study. Update this statement if institutional or sponsored support applies.
+
+\textbf{Conflict of interest/Competing interests}\\
+The authors declare that they have no competing interests.
+
+\textbf{Ethics approval and consent to participate}\\
+Not applicable.
+
+\textbf{Consent for publication}\\
+Not applicable.
+
+\textbf{Data availability}\\
+The study uses project datasets contained in the repository, including \texttt{data/india/india\_regions.csv}, \texttt{data/regional/kerala\_uttarakhand\_risk\_timeseries.csv}, \texttt{data/inventory/kerala\_uttarakhand\_inventory\_mapped.csv}, and rainfall records derived from NASA POWER in \texttt{data/regional/nasa\_power\_daily\_kerala\_uttarakhand.csv}. If the repository is made public, replace this statement with the final public archive or DOI.
+
+\textbf{Materials availability}\\
+Not applicable.
+
+\textbf{Code availability}\\
+The implementation consists of Python source code, training scripts, research-evaluation utilities, API services, and dashboard components maintained in the project repository. Replace this statement with the final repository URL or DOI before submission.
+
+\textbf{Author contribution}\\
+Replace this section with the actual contribution statement for each author according to the target journal's policy.
+
+\begin{thebibliography}{99}
+\bibitem{froude2018}
+Froude MJ, Petley DN (2018) Global fatal landslide occurrence from 2004 to 2016. \textit{Natural Hazards and Earth System Sciences} 18:2161--2181. \url{https://doi.org/10.5194/nhess-18-2161-2018}
+
+\bibitem{guzzetti2012}
+Guzzetti F, Mondini AC, Cardinali M, Fiorucci F, Santangelo M, Chang KT (2012) Landslide inventory maps: New tools for an old problem. \textit{Earth-Science Reviews} 112(1--2):42--66. \url{https://doi.org/10.1016/j.earscirev.2012.02.001}
+
+\bibitem{hao2020}
+Hao L, Rajaneesh A, van Westen C, Sajinkumar KS, Martha TR, Jaiswal P, McAdoo BG (2020) Constructing a complete landslide inventory dataset for the 2018 monsoon disaster in Kerala, India, for land use change analysis. \textit{Earth System Science Data} 12:2899--2918. \url{https://doi.org/10.5194/essd-12-2899-2020}
+
+\bibitem{azarafza2021}
+Azarafza M, Azarafza M, Akg\"un H, Atkinson PM, Derakhshani R (2021) Deep learning-based landslide susceptibility mapping. \textit{Scientific Reports} 11:24112. \url{https://doi.org/10.1038/s41598-021-03585-1}
+
+\bibitem{youssef2023}
+Youssef K, Shao K, Moon S, \textit{et al.} (2023) Landslide susceptibility modeling by interpretable neural network. \textit{Communications Earth \& Environment} 4:162. \url{https://doi.org/10.1038/s43247-023-00806-5}
+
+\bibitem{wang2024gnn}
+Wang Y, Li Y, Liu H, \textit{et al.} (2024) A landslide susceptibility assessment method considering the similarity of geographic environments based on graph neural network. \textit{Georisk}. \url{https://doi.org/10.1016/j.gr.2024.04.013}
+
+\bibitem{villac_a2024}
+Villa\c{c}a C, Santos PP, Z\^ezere JL (2024) Modelling the rainfall threshold for shallow landslides considering the landslide predisposing factors in Portugal. \textit{Landslides} 21:2119--2133. \url{https://doi.org/10.1007/s10346-024-02284-y}
+
+\bibitem{gonzalez2023}
+Gonzalez FCG, Cavalcanti MCR, Ribeiro WN, de Mendon\c{c}a MB, Haddad AN (2023) A systematic review on rainfall thresholds for landslides occurrence. \textit{Heliyon} 9(12):e23247. \url{https://doi.org/10.1016/j.heliyon.2023.e23247}
+
+\bibitem{nasapowerdocs}
+NASA Langley Research Center POWER Project (accessed 2026) NASA POWER daily API documentation and referencing guide. Available at \url{https://power.larc.nasa.gov/docs/services/api/temporal/daily/} and \url{https://power.larc.nasa.gov/docs/referencing/}
+\end{thebibliography}
+
+\end{document}

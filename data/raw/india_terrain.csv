@@ -1,0 +1,60 @@
+region_id,state,district,elevation_m,slope_deg,ndvi
+IN-TVM-THIRUVANANTHAPURAM,Kerala,Thiruvananthapuram,64,12,0.6
+IN-KOL-KOLLAM,Kerala,Kollam,71,14,0.59
+IN-PAT-PATHANAMTHITTA,Kerala,Pathanamthitta,110,18,0.55
+IN-ALA-ALAPPUZHA,Kerala,Alappuzha,8,7,0.63
+IN-KOT-KOTTAYAM,Kerala,Kottayam,72,16,0.58
+IN-IDU-IDUKKI,Kerala,Idukki,1240,38,0.31
+IN-ERN-ERNAKULAM,Kerala,Ernakulam,12,9,0.66
+IN-THR-THRISSUR,Kerala,Thrissur,20,11,0.62
+IN-PAL-PALAKKAD,Kerala,Palakkad,140,21,0.53
+IN-MAL-MALAPPURAM,Kerala,Malappuram,54,17,0.57
+IN-KOZ-KOZHIKODE,Kerala,Kozhikode,11,10,0.65
+IN-WAY-WAYANAD,Kerala,Wayanad,890,33,0.42
+IN-KAN-KANNUR,Kerala,Kannur,10,12,0.61
+IN-KAS-KASARAGOD,Kerala,Kasaragod,26,14,0.59
+IN-KOD-KODAGU,Karnataka,Kodagu,1170,35,0.39
+IN-CHI-CHIKKAMAGALURU,Karnataka,Chikkamagaluru,1090,32,0.44
+IN-NIL-NILGIRIS,Tamil Nadu,Nilgiris,2240,29,0.46
+IN-DIN-DINDIGUL,Tamil Nadu,Dindigul,1018,27,0.49
+IN-RAI-RAIGAD,Maharashtra,Raigad,570,24,0.52
+IN-RAT-RATNAGIRI,Maharashtra,Ratnagiri,350,22,0.57
+IN-SAT-SATARA,Maharashtra,Satara,742,23,0.55
+IN-NGO-NORTHGOA,Goa,North Goa,250,18,0.6
+IN-DAR-DARJEELING,West Bengal,Darjeeling,980,24,0.58
+IN-KAL-KALIMPONG,West Bengal,Kalimpong,1250,28,0.51
+IN-GAN-GANGTOK,Sikkim,Gangtok,1510,42,0.4
+IN-NAM-NAMCHI,Sikkim,Namchi,1675,34,0.47
+IN-MAN-MANGAN,Sikkim,Mangan,1400,36,0.45
+IN-SHI-SHIMLA,Himachal Pradesh,Shimla,2206,36,0.37
+IN-KUL-KULLU,Himachal Pradesh,Kullu,1279,34,0.45
+IN-CHM-CHAMBA,Himachal Pradesh,Chamba,996,31,0.47
+IN-KIN-KINNAUR,Himachal Pradesh,Kinnaur,2960,37,0.41
+IN-MAN-MANDI,Himachal Pradesh,Mandi,1044,26,0.5
+IN-ALM-ALMORA,Uttarakhand,Almora,1638,24,0.5
+IN-BAG-BAGESHWAR,Uttarakhand,Bageshwar,1004,27,0.46
+IN-CHA-CHAMOLI,Uttarakhand,Chamoli,1820,41,0.35
+IN-CHP-CHAMPAWAT,Uttarakhand,Champawat,1615,25,0.49
+IN-DEH-DEHRADUN,Uttarakhand,Dehradun,640,18,0.56
+IN-HAR-HARIDWAR,Uttarakhand,Haridwar,249,10,0.61
+IN-PIT-PITHORAGARH,Uttarakhand,Pithoragarh,1650,37,0.38
+IN-PAU-PAURIGARHWAL,Uttarakhand,Pauri Garhwal,1814,26,0.47
+IN-RUD-RUDRAPRAYAG,Uttarakhand,Rudraprayag,895,32,0.43
+IN-TEH-TEHRIGARHWAL,Uttarakhand,Tehri Garhwal,1550,31,0.44
+IN-UDH-UDHAMSINGHNAGAR,Uttarakhand,Udham Singh Nagar,230,8,0.63
+IN-UTK-UTTARKASHI,Uttarakhand,Uttarkashi,1158,35,0.41
+IN-NAI-NAINITAL,Uttarakhand,Nainital,2084,28,0.48
+IN-AIZ-AIZAWL,Mizoram,Aizawl,1132,39,0.34
+IN-LUN-LUNGLEI,Mizoram,Lunglei,1222,32,0.43
+IN-KOL-KOLASIB,Mizoram,Kolasib,636,25,0.5
+IN-EKH-EASTKHASIHILLS,Meghalaya,East Khasi Hills,1496,30,0.49
+IN-WJH-WESTJAINTIAHILLS,Meghalaya,West Jaintia Hills,1380,28,0.51
+IN-SGH-SOUTHGAROHILLS,Meghalaya,South Garo Hills,920,24,0.56
+IN-DIM-DIMAHASAO,Assam,Dima Hasao,686,27,0.55
+IN-KAR-KARBIALONG,Assam,Karbi Anglong,503,23,0.58
+IN-PAP-PAPUMPARE,Arunachal Pradesh,Papum Pare,1200,34,0.44
+IN-TAW-TAWANG,Arunachal Pradesh,Tawang,3048,29,0.46
+IN-WKA-WESTKAMENG,Arunachal Pradesh,West Kameng,1840,31,0.48
+IN-KOH-KOHIMA,Nagaland,Kohima,1444,26,0.52
+IN-PHE-PHEK,Nagaland,Phek,1524,29,0.49
+IN-SEN-SENAPATI,Manipur,Senapati,1061,28,0.5
